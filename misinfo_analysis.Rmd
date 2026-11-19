@@ -1,0 +1,190 @@
+---
+title: "misinfo_analysis"
+output:
+  pdf_document: default
+  html_document: default
+date: "2026-11-19"
+---
+# 'knitr' is a new tool we are using, and we will be using the same r project for this and next weel's seminar
+
+In the empty () for col, we can use it define levels like line 22
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(dplyr)
+library(readr)
+library(ggplot2)
+library(knitr)
+
+lul_d <- read_csv(
+  '../data/life-under-lockdown-wave2-extract.csv',
+ col_types = cols(
+    col_integer(),
+    col_factor(),
+    col_factor(levels = c(
+      'Nothing at all',
+      'Not very much',
+      'A fair amount',
+      'A great deal'
+    )),
+    col_integer()
+  )
+  )
+```
+The col part is to identify what kind of data each column is in order for R to use the data correctly
+
+# Descriptive statstics
+kable command is used to make the graph easier to read
+```{r}
+lul_d %>% 
+  ggplot(
+    aes (x = gender)
+  ) +
+  geom_bar()
+```
+```{r}
+lul_d %>%
+  count(gender) %>% 
+  kable 
+```
+binwidth = n, the n is the amount of space each category takes up
+```{r}
+lul_d %>%
+  ggplot(
+    aes(x = beliefs)
+  ) +
+  geom_histogram(binwidth = 1)
+```
+kable(digits = n) command rounds the number to the decimal point of n
+```{r}
+lul_d %>%
+  summarise(
+    n = n(),
+    Mdn = median(beliefs),
+    M = mean(beliefs),
+    SD = sd(beliefs)
+  ) %>%
+  kable(digits = 2)
+```
+# Hypothesis
+Gender is associated with mean number of misformation beliefs.
+
+#Analysis
+```{r}
+lul_d %>%
+  group_by(gender) %>%
+  summarise(
+    n = n(),
+    Mdn = median(beliefs),
+    M = mean(beliefs),
+    SD = sd(beliefs)
+  ) %>%
+  kable(digits = 2)
+```
+filter command filters out the mentioned part of the category
+the . in the data = . is the filtered data 
+```{r}
+lul_d %>%
+  filter(gender != 'In another way') %>%
+  t.test(
+    formula = beliefs ~ gender, 
+    var.equal = FALSE,
+    data = .
+  )
+```
+---
+title: "coronavirus_misinformation"
+output:
+  pdf_document: default
+  html_document: default
+date: "2026-11-19"
+---
+# 'knitr' is a new tool we are using, and we will be using the same r project for this and next weel's seminar
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(dplyr)
+library(readr)
+library(ggplot2)
+library(knitr)
+
+lul_d <- read_csv(
+  '../data/life-under-lockdown-wave2-extract.csv',
+  col_types = cols(
+    col_integer(),
+    col_factor(),
+    col_factor(levels = c(
+      'Nothing at all',
+      'Not very much',
+      'A fair amount',
+      'A great deal'
+    )),
+    col_integer()
+  )
+  )
+```
+The col part is to identify what kind of data each column is in order for R to use the data correctly
+
+# Descriptive statstics
+kable command is used to make the graph easier to read
+```{r}
+lul_d %>% 
+  ggplot(
+    aes (x = gender)
+  ) +
+  geom_bar()
+```
+```{r}
+lul_d %>%
+  count(gender) %>% 
+  kable 
+```
+binwidth = n, the n is the amount of space each category takes up
+```{r}
+lul_d %>%
+  ggplot(
+    aes(x = beliefs)
+  ) +
+  geom_histogram(binwidth = 1)
+```
+kable(digits = n) command rounds the number to the decimal point of n
+```{r}
+lul_d %>%
+  summarise(
+    n = n(),
+    Mdn = median(beliefs),
+    M = mean(beliefs),
+    SD = sd(beliefs)
+  ) %>%
+  kable(digits = 2)
+```
+# Hypothesis
+Gender is associated with mean number of misformation beliefs.
+
+#Analysis
+```{r}
+lul_d %>%
+  group_by(gender) %>%
+  summarise(
+    n = n(),
+    Mdn = median(beliefs),
+    M = mean(beliefs),
+    SD = sd(beliefs)
+  ) %>%
+  kable(digits = 2)
+```
+filter command filters out the mentioned part of the category
+the . in the data = . is the filtered data 
+```{r}
+lul_d %>%
+  filter(gender != 'In another way') %>%
+  t.test(
+    formula = beliefs ~ gender, 
+    var.equal = FALSE,
+    data = .
+  )
+```
+There are too few people who identified in another way for them to be included in the full analysis. Males had slightly more misinformation beliefs (M = 0.73, SD = 1.13) than females (M = 0.61, SD = 1.05), but this was not statstically significant, t(494.31) = 1.201, p = .230.
+
+Use the Knit button on top, we can export all of this information into a nice pdf/word file
+
